@@ -21,20 +21,20 @@ shinyUI(fluidPage(
        #粘贴文本的地方
        textInput("text","please insert text"),
        #选择已存在的文本
-       selectInput("text","Or...you can select an exist text",c('a','b','c')),
+       selectInput("text","Or...you can select an exist text",c('demoFreq','demoFreqC')),
        #选择图形
-       selectInput("shape","select a shape ",c('cat','dog','duck')),
+       selectInput("shape","select a shape ",c('circle','cardioid','diamond','pentagon','star','triangle','triangle-forward')),
        #展示多少个词
        sliderInput("bins",
                    "Number of words to show:",
                    min = 1,
                    max = 50,
-                   value = 30)
+                   value = 30),width = 3
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("distPlot")
+       wordcloud2Output("distPlot")
     )
   )
 ))
