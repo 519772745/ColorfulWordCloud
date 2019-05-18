@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(wordcloud2)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -18,23 +19,33 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
-       #粘贴文本的地方
        textInput("text","please insert text"),
-       #选择已存在的文本
+       
+       #select default text
        selectInput("text","Or...you can select an exist text",c('demoFreq','demoFreqC')),
-       #选择图形
+       
+       #select a shape
        selectInput("shape","select a shape ",c('circle','cardioid','diamond','pentagon','star','triangle','triangle-forward')),
-       #展示多少个词
+       
+       #how many to show
        sliderInput("bins",
                    "Number of words to show:",
                    min = 1,
                    max = 50,
-                   value = 30),width = 3
+                   value = 30),
+       
+       #font family
+       selectInput("fontFamily","font family",c('-defalut-','Arial','Centaur','Comic sans MS','Courier New','Impact','Verdana','FangSong','KaiTi','SimHei','SimSun'))
+       ,
+       
+       #word color
+       selectInput("wordColor","word color",c('random-dark','random-light','skyblue')),
+       width = 3
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
-       wordcloud2Output("distPlot")
+       wordcloud2Output("distPlot"),width=9
     )
   )
 ))

@@ -12,18 +12,16 @@ library(wordcloud2)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   output$distPlot <- renderWordcloud2({
-    #获取默认的数据集
     data <- switch (input$text,
       'demoFreq' = demoFreq,
       'demoFreqC'=demoFreqC
     )
     
-    #生成文字云
     wordcloud2(data, size = 1, minSize = 0, gridSize =  0,  
                        
-                       fontFamily = NULL, fontWeight = 'normal',  
+                       fontFamily = input$fontFamily, fontWeight = 'normal',  
                        
-                       color = 'random-dark', backgroundColor = "white",  
+                       color = input$wordColor, backgroundColor = "white",  
                        
                        minRotation = -pi/4, maxRotation = pi/4, rotateRatio = 0.4,  
                        

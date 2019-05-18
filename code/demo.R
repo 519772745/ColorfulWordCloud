@@ -32,3 +32,37 @@ wordcloud2(demoFreqC, size = 1, minSize = 0, gridSize =  0,
 #（8）rotationRation：字体旋转比例，如设定为1，则全部词语都会发生旋转；
 
 #（9）shape：词云形状选择，默认是‘circle’，即圆形。还可以选择‘cardioid’（苹果形或心形），‘star’（星形），‘diamond’（钻石），‘triangle-forward’（三角形），‘triangle’（三角形），‘pentagon’（五边形）
+
+
+
+#安装中文分词包
+install.packages("jiebaR")
+library("jiebaR")
+
+wk = worker()
+wk["我是《R的极客理想》图书作者"]
+
+
+#英文词频
+install.packages("dplyr")
+library(dplyr)
+filePath = E:\\Rproject\\summer.txt
+text = readLines(filePath)
+txt = text[text!=""]
+txt = tolower(txt)
+txtList = lapply(txt, strsplit," ")
+txtChar = unlist(txtList)
+txtChar = gsub("\\.|,|\\!|:|;|\\?","",txtChar) #clean symbol(.,!:;?)
+txtChar = txtChar[txtChar!=""]
+data = as.data.frame(table(txtChar))
+colnames(data) = c("Word","freq")
+ordFreq = data[order(data$freq,decreasing=T),]
+
+#过滤常见词，这里只过滤掉常见的100个词
+filePath = E:\\Rproject\\top100_diy.csv  #the meaningless word
+df = read.csv(filePath,header = T)
+Word = select(df,Word)
+antiWord = data.frame(Word,stringsAsFactors=F)
+result = anti_join(ordFreq,antiWord,by="Word") %>% arrange(desc(freq)) #ordFreq - antiWord，即取差集
+
+result = result[1:50,]
