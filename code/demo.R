@@ -1,7 +1,7 @@
 #进行文字云前要做的事
 
 #1.安装文字云的包
-install.packages("wordcloud2")
+install.packages('wordcloud2')
 #2.加载文字云的包
 library(wordcloud2)
 #3.语法精要
@@ -9,7 +9,7 @@ wordcloud2(demoFreqC, size = 1, minSize = 0, gridSize =  0,
            
            fontFamily = NULL, fontWeight = 'normal',  
            
-           color = 'random-dark', backgroundColor = "white",  
+           color = 'random-dark', backgroundColor = 'white',  
            
            minRotation = -pi/4, maxRotation = pi/4, rotateRatio = 0.4,  
            
@@ -36,33 +36,75 @@ wordcloud2(demoFreqC, size = 1, minSize = 0, gridSize =  0,
 
 
 #安装中文分词包
-install.packages("jiebaR")
-library("jiebaR")
+install.packages('jiebaR')
+library('jiebaR')
 
 wk = worker()
-wk["我是《R的极客理想》图书作者"]
+wk['我是《R的极客理想》图书作者']
 
 
 #英文词频
-install.packages("dplyr")
+
+#安装包
+#dplyr用于数据处理
+#textstem 用于做词形还原
+#readr 用于读取文件
+install.packages('dplyr')
+install.packages('textstem')
+install.packages('plyr')
 library(dplyr)
-filePath = E:\\Rproject\\summer.txt
-text = readLines(filePath)
-txt = text[text!=""]
+library(readr)
+library(textstem)
+library(plyr)
+
+#1.读取停用词
+stop_word <- read_csv('F:/Study/WordCloud/WordFreq/stop-word-list.csv') 
+
+#2.读取要分析的文本文件
+filePath = 'F:/Study/WordCloud/book/Gilbert_Strang_Introduction_to_Linear_Algebra__2009.txt'
+text = readLines(filePath,encoding = 'UTF-8')
+#3.去除无意义的换行，存在txt中
+txt = text[text!='']
+#4.全部转换为小写，避免大小写的影响
 txt = tolower(txt)
-txtList = lapply(txt, strsplit," ")
+
+#5.将字符串以空格为划分，存入list中
+txtList = lapply(txt, strsplit,' ')
+#6.去除标点符号的影响(.,!:;?()~)
+#7.simplifies it to produce a vector which contains all the atomic components which occur
 txtChar = unlist(txtList)
-txtChar = gsub("\\.|,|\\!|:|;|\\?","",txtChar) #clean symbol(.,!:;?)
-txtChar = txtChar[txtChar!=""]
+txtChar = gsub('\\.|,|\\!|:|;|\\?|\\(|\\)|~|\\[|\\]|\\"|\\/|\\+','',txtChar) 
+txtChar = txtChar[txtChar!='']
+
+#8.将处理干净的数据放入data中，并给各列命名
 data = as.data.frame(table(txtChar))
-colnames(data) = c("Word","freq")
+colnames(data) = c('Word','freq')
+
+#9.将数据排序
 ordFreq = data[order(data$freq,decreasing=T),]
 
-#过滤常见词，这里只过滤掉常见的100个词
-filePath = E:\\Rproject\\top100_diy.csv  #the meaningless word
-df = read.csv(filePath,header = T)
-Word = select(df,Word)
-antiWord = data.frame(Word,stringsAsFactors=F)
-result = anti_join(ordFreq,antiWord,by="Word") %>% arrange(desc(freq)) #ordFreq - antiWord，即取差集
+#10.过滤停用词
+antiWord = data.frame(stop_word,stringsAsFactors=F)
+result = anti_join(ordFreq,antiWord,by='Word') %>% arrange(desc(freq)) #ordFreq - antiWord，即取差集
 
+#11.进行词形还原；在这里进行词形还原是为了效率更高
+lemmatize_result <- lemmatize_words(result$Word)
+result$Word=lemmatize_result
+result=na.omit(result)
+
+#12.合并相同的词，并将freq相加
+result=aggregate(freq ~ Word, data = result, sum)
+
+#13.筛选长度大于2的词(通常小于2的词都是一些无意义的单词、数字、符号)
+result <- filter(result, nchar(as.character(Word)) > 3)
+result <- filter(result, freq > 2)
+
+#14.重新排序
+result = result[order(result$freq,decreasing=T),]
+
+
+
+#13.取长度
 result = result[1:50,]
+
+
