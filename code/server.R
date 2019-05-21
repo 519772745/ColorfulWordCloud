@@ -28,29 +28,70 @@ stop_word <- read_csv('F:/Study/WordCloud/WordFreq/stop-word-list.csv')
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   output$distPlot <- renderWordcloud2({
-    data <- switch (input$text,
-      'demoFreq' = demoFreq,
-      'demoFreqC'=demoFreqC
-    )
+    #1.
+    if(is.null(input$text$datapath)){
+      data <- demoFreq
+    }
+    else{
+      data <-GenerateWordFreq(input$text$datapath)
+    }
+  
+    #2.shape
+    tempFig=NULL
+    if(is.null(input$custom_shape)){
+      wshape=input$shape
+      wfigPath=NULL
+    }else{
+      if(is.null(tempFig) || tempFig!=input$custom_shape$datapath){
+        tempFig=input$custom_shape$datapath
+        wfigPath=input$custom_shape$datapath
+        wshape=NULL
+      }else{
+        wfigPath=NULL
+        wshape=input$shape
+      }
+        
+    }
+    print(wshape)
+    print(wfigPath)
     
-    wordcloud2(GenerateWordFreq(), size = 1, minSize = 0, gridSize =  0,  
+    #3.rotation
+    textlayout=input$textlayout
+    if(textlayout=='horizontal'){
+      minRotation=0
+      maxRotation=0
+      rotateRatio=1
+    }else if(textlayout=='verticality'){
+      minRotation= -pi/2
+      maxRotation= -pi/2
+      rotateRatio=1
+    }else{
+      minRotation=-pi/4
+      maxRotation= pi/4
+      rotateRatio=0.4
+    }
+
+    #4.bins
+    length=nrow(data)
+    
+    
+    wordcloud2(data[0:(length*(input$bins/100)),], size = 1, minSize = 0, gridSize =  0,  
                        
                        fontFamily = input$fontFamily, fontWeight = 'normal',  
                        
-                       color = input$wordColor, backgroundColor = "white",  
+                       color = input$wordColor, backgroundColor = input$backgroundColor,  
                        
-                       minRotation = -pi/4, maxRotation = pi/4, rotateRatio = 0.4,  
+                       minRotation = minRotation, maxRotation = maxRotation, rotateRatio = rotateRatio,  
                        
-                       shape=input$shape, ellipticity = 0.65, widgetsize = NULL) 
+                       shape=wshape, figPath=wfigPath,ellipticity = 0.65, widgetsize = NULL) 
   })
   
 })
 
 #Fection for word frequency statistics
-GenerateWordFreq <- function(){
+GenerateWordFreq <- function(file_path){
   #2.Read the text file to be analyzed
-  filePath = 'F:/Study/WordCloud/book/Gilbert_Strang_Introduction_to_Linear_Algebra__2009.txt'
-  text = readLines(filePath,encoding = 'UTF-8')
+  text = readLines(file_path,encoding = 'UTF-8')
   #3.Remove meaningless line breaks, in txt
   txt = text[text!='']
   #4.Convert all to lowercase, avoiding the impact of capitalization
