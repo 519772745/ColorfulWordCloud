@@ -72,8 +72,16 @@ shinyUI(fluidPage(
       
     ),
     # Show a plot of the generated distribution
-    mainPanel(
-      wordcloud2Output("distPlot"),width=9
+    mainPanel(HTML(
+      '<div style="width:100%;height:800px;overflow:hidden;positive:absolute">'),wordcloud2Output("distPlot"),width=9,HTML('</div>',
+      '<script>',
+      'window.onload=function(){
+        var elem=document.getElementById("distPlot");
+        elem.style.height="800px";
+      }',
+      '</script>'
+      )
     )
+    
   )
 ))
