@@ -74,17 +74,37 @@ shinyServer(function(input, output) {
     #4.bins
     length=nrow(data)
     
+    #5.color
+    colorcontrol <- input$wordColor
+    if(colorcontrol=='custom-colors'){
+      colorcontrol = input$cl
+    }else{
+      colorcontrol = input$wordColor
+    }
     
     wordcloud2(data[0:(length*(input$bins/100)),], size = 1, minSize = 0, gridSize =  0,  
                        
                        fontFamily = input$fontFamily, fontWeight = 'normal',  
                        
-                       color = input$wordColor, backgroundColor = input$backgroundColor,  
+                       color = colorcontrol, backgroundColor = input$backgroundColor,  
                        
                        minRotation = minRotation, maxRotation = maxRotation, rotateRatio = rotateRatio,  
                        
                        shape=wshape, figPath=wfigPath,ellipticity = 0.65, widgetsize = NULL) 
   })
+
+  #3data <- mtcars
+  ##6.download
+  #output$dowmloadData <- downloadHandler(
+  #  filename = function(){
+  #    paste('data',Sys.Date(),'.csv',sep='')
+  #  },
+  #  content = function(file){
+  #    write.csv(data,file)
+  #  }
+  #)
+  
+  
   
 })
 

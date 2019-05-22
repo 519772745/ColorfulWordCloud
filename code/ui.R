@@ -47,12 +47,17 @@ shinyUI(fluidPage(
       
       #word color
       #random
-      selectInput("wordColor","word color",c('random-dark','random-light')),
+      #selectInput("wordColor","word color",c('random-dark','random-light')),
+      radioButtons("wordColor","Choose Word Color",c(
+        "random-dark"="random-dark",
+        "random-light"="random-light",
+        "custom-colors"="custom-colors"
+      )),
       
       #only one color
-      HTML('<label for="clx">choose word color(all word one color)</label>',
-           '<input id="clx" type="color" class="form-control" value="#ffffaa">',
-           '<input id="cl" type="text" class="form-control" value="#ffffaa" style="display:none">',
+      #'<label for="clx">choose word color(all word one color)</label>',
+      HTML('<input id="clx" type="color" class="form-control" value="#ff0000">',
+           '<input id="cl" type="text" class="form-control" value="#ff0000" style="display:none">',
            '<script>',
            '$(function(){$("#clx").change(function(){$("#cl").val($(this).val()).trigger("change");});})',
            '</script>'
@@ -73,14 +78,17 @@ shinyUI(fluidPage(
     ),
     # Show a plot of the generated distribution
     mainPanel(HTML(
-      '<div style="width:100%;height:800px;overflow:hidden;positive:absolute">'),wordcloud2Output("distPlot"),width=9,HTML('</div>',
+      '<div style="width:100%;height:700px;overflow:hidden;positive:absolute">'),wordcloud2Output("distPlot"),width=9,HTML('</div>',
       '<script>',
       'window.onload=function(){
         var elem=document.getElementById("distPlot");
-        elem.style.height="800px";
+        elem.style.height="700px";
       }',
       '</script>'
-      )
+      ),
+      
+      downloadLink('downloadData', 'Download')
+      
     )
     
   )
