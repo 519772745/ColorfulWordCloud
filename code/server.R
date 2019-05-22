@@ -17,17 +17,19 @@ library(wordcloud2)
 #readr read the file(*txt only)
 #textstem for lemmatization
 #plyr for statistical frequency
+library(plyr)
 library(dplyr)
 library(readr)
 library(textstem)
-library(plyr)
+
 
 #define stop word
-stop_word <- read_csv('F:/Study/WordCloud/WordFreq/stop-word-list.csv') 
+stop_word <- read_csv('./WordFreq/stop-word-list.csv') 
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   output$distPlot <- renderWordcloud2({
+
     #1.
     if(is.null(input$text$datapath)){
       data <- demoFreq
@@ -35,25 +37,6 @@ shinyServer(function(input, output) {
     else{
       data <-GenerateWordFreq(input$text$datapath)
     }
-  
-    #2.shape
-    tempFig=NULL
-    if(is.null(input$custom_shape)){
-      wshape=input$shape
-      wfigPath=NULL
-    }else{
-      if(is.null(tempFig) || tempFig!=input$custom_shape$datapath){
-        tempFig=input$custom_shape$datapath
-        wfigPath=input$custom_shape$datapath
-        wshape=NULL
-      }else{
-        wfigPath=NULL
-        wshape=input$shape
-      }
-        
-    }
-    print(wshape)
-    print(wfigPath)
     
     #3.rotation
     textlayout=input$textlayout
@@ -83,8 +66,8 @@ shinyServer(function(input, output) {
                        
                        minRotation = minRotation, maxRotation = maxRotation, rotateRatio = rotateRatio,  
                        
-                       shape=wshape, figPath=wfigPath,ellipticity = 0.65, widgetsize = NULL) 
-  })
+                       shape=input$shape,ellipticity = 0.65, widgetsize = NULL) 
+   })
   
 })
 
@@ -112,17 +95,17 @@ GenerateWordFreq <- function(file_path){
   #9.Sort data
   ordFreq = data[order(data$freq,decreasing=T),]
   
-  #10.Filter stop words
-  antiWord = data.frame(stop_word,stringsAsFactors=F)
-  result = anti_join(ordFreq,antiWord,by='Word') %>% arrange(desc(freq))
-  
-  #11.Performing a morphological restoration; here the morphological restoration is done for greater efficiency
+  #10.Performing a morphological restoration; here the morphological restoration is done for greater efficiency
   lemmatize_result <- lemmatize_words(result$Word)
   result$Word=lemmatize_result
   result=na.omit(result)
   
-  #12.Combine the same words and add freq
+  #11.Combine the same words and add freq
   result=aggregate(freq ~ Word, data = result, sum)
+  
+  #12.Filter stop words
+  antiWord = data.frame(stop_word,stringsAsFactors=F)
+  result = anti_join(ordFreq,antiWord,by='Word') %>% arrange(desc(freq))
   
   #13.Filter words with a length greater than 2 (usually less than 2 words are meaningless words, numbers, symbols)
   result <- filter(result, nchar(as.character(Word)) > 3)

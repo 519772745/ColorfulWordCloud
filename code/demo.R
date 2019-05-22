@@ -108,3 +108,22 @@ result = result[order(result$freq,decreasing=T),]
 result = result[1:50,]
 
 
+#自定义形状
+library(wordcloud2)
+
+batman = system.file("examples/ma.png",package = "wordcloud2")
+p=wordcloud2(demoFreq, size = 1,color = "black")
+
+png(filename = "p.png",width = 1200,height = 900,res = 300)
+wordcloud2()
+print(p)
+dev.off()
+
+
+install.packages("webshot")
+webshot::install_phantomjs()
+library(wordcloud2)
+library("webshot")
+hw = wordcloud2(demoFreq,size = 3)
+saveWidget(hw,"1.html",selfcontained = F)
+webshot::webshot("1.html","1.png",vwidth = 1992, vheight = 1744, delay =10)

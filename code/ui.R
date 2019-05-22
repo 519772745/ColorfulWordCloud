@@ -22,7 +22,6 @@ library(plyr)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
-  
   # Application title
   titlePanel("Colorful Word Cloud"),
   
@@ -34,8 +33,6 @@ shinyUI(fluidPage(
       
       #select a shape
       selectInput("shape","select a shape ",c('circle','cardioid','diamond','pentagon','star','triangle','triangle-forward')),
-      #select your file
-      fileInput("custom_shape", "or upload a Shape", multiple = FALSE, accept = NULL, width = NULL, buttonLabel = "Browse...", placeholder = "No selected"),
       
       #text layout
       radioButtons("textlayout","text layout type",selected="random",c("random"="random","horizontal"="horizontal","verticality"="verticality")),
