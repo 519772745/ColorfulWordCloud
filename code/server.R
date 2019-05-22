@@ -26,14 +26,15 @@ library(textstem)
 
 #define stop word
 stop_word <- read_csv('./WordFreq/stop-word-list.csv') 
-
+welcome_word <-read_csv('./welcome/demo.csv')
+print(welcome_word)
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   output$distPlot <- renderWordcloud2({
 
     #1.
     if(is.null(input$text$datapath)){
-      data <- demoFreq
+      data <- welcome_word
     }
     else{
       data <-GenerateWordFreq(input$text$datapath)
@@ -58,7 +59,7 @@ shinyServer(function(input, output) {
 
     #4.bins
     length=nrow(data)
-    
+    print(length)
     #5.color
     colorcontrol <- input$wordColor
     if(colorcontrol=='custom-colors'){
@@ -66,8 +67,8 @@ shinyServer(function(input, output) {
     }else{
       colorcontrol = input$wordColor
     }
-    
-    wordcloud2(data[0:(length*(input$bins/100)),], size = 1, minSize = 0, gridSize =  0,  
+    print(input$bins)
+    wordcloud2(data[0:(length*(input$bins / 100)),], size = 1, minSize = 0, gridSize =  0,  
                        
                        fontFamily = input$fontFamily, fontWeight = 'normal',  
                         

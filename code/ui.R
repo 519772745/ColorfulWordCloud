@@ -82,10 +82,7 @@ shinyUI(fluidPage(
         elem.style.height="700px";
       }',
       '</script>'
-      ),
-      
-      downloadLink('downloadData', 'Download')
-      
+      )
     )
     
   )
