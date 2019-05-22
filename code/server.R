@@ -23,6 +23,7 @@ library(readr)
 library(textstem)
 
 
+
 #define stop word
 stop_word <- read_csv('./WordFreq/stop-word-list.csv') 
 
@@ -37,6 +38,7 @@ shinyServer(function(input, output) {
     else{
       data <-GenerateWordFreq(input$text$datapath)
     }
+
     
     #3.rotation
     textlayout=input$textlayout
@@ -57,17 +59,37 @@ shinyServer(function(input, output) {
     #4.bins
     length=nrow(data)
     
+    #5.color
+    colorcontrol <- input$wordColor
+    if(colorcontrol=='custom-colors'){
+      colorcontrol = input$cl
+    }else{
+      colorcontrol = input$wordColor
+    }
     
     wordcloud2(data[0:(length*(input$bins/100)),], size = 1, minSize = 0, gridSize =  0,  
                        
                        fontFamily = input$fontFamily, fontWeight = 'normal',  
-                       
-                       color = input$wordColor, backgroundColor = input$backgroundColor,  
+                        
+                       color = colorcontrol, backgroundColor = input$backgroundColor,  
                        
                        minRotation = minRotation, maxRotation = maxRotation, rotateRatio = rotateRatio,  
                        
                        shape=input$shape,ellipticity = 0.65, widgetsize = NULL) 
    })
+
+  #3data <- mtcars
+  ##6.download
+  #output$dowmloadData <- downloadHandler(
+  #  filename = function(){
+  #    paste('data',Sys.Date(),'.csv',sep='')
+  #  },
+  #  content = function(file){
+  #    write.csv(data,file)
+  #  }
+  #)
+  
+  
   
 })
 
@@ -95,11 +117,13 @@ GenerateWordFreq <- function(file_path){
   #9.Sort data
   ordFreq = data[order(data$freq,decreasing=T),]
   
+
   #10.Performing a morphological restoration; here the morphological restoration is done for greater efficiency
   lemmatize_result <- lemmatize_words(result$Word)
   result$Word=lemmatize_result
   result=na.omit(result)
   
+
   #11.Combine the same words and add freq
   result=aggregate(freq ~ Word, data = result, sum)
   
