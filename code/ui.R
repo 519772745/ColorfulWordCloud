@@ -29,22 +29,21 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       #select your file
-      fileInput("text", "upload a file", multiple = FALSE, accept = NULL, width = NULL, buttonLabel = "Browse...", placeholder = "No selected"),
+      fileInput("text", "Upload a file", multiple = FALSE, width = NULL, buttonLabel = "Browse...", placeholder = "No selected",accept="*.txt"),
+      HTML('<p style="margin-top:-15px;margin-bottom:15px"><b>Note:</b> Only accept <b>TXT</b> files in <b>English</b> (including symbols)</p>'),
       
       #select a shape
-      selectInput("shape","select a shape ",c('circle','cardioid','diamond','pentagon','star','triangle','triangle-forward')),
+      selectInput("shape","Select a shape ",c('circle','cardioid','diamond','pentagon','star','triangle','triangle-forward')),
       
       #text layout
-      radioButtons("textlayout","text layout type",selected="random",c("random"="random","horizontal"="horizontal","verticality"="verticality")),
+      radioButtons("textlayout","Text layout type",selected="random",c("random"="random","horizontal"="horizontal","verticality"="verticality")),
       
       #font family
-      selectInput("fontFamily","font family",c('-defalut-','Arial','Times New Roman','Lucida Caligraphy','Helvetica','STCaiyun','STXingkai','Centaur','Comic sans MS','Courier New','Impact','Verdana','FangSong','KaiTi','SimHei','SimSun')),
+      selectInput("fontFamily","Font family",c('-defalut-','Arial','Times New Roman','Lucida Caligraphy','Helvetica','STCaiyun','STXingkai','Centaur','Comic sans MS','Courier New','Impact','Verdana','FangSong','KaiTi','SimHei','SimSun')),
       
       
       
       #word color
-      #random
-      #selectInput("wordColor","word color",c('random-dark','random-light')),
       radioButtons("wordColor","Choose Word Color",c(
         "random-dark"="random-dark",
         "random-light"="random-light",
@@ -52,7 +51,6 @@ shinyUI(fluidPage(
       )),
       
       #only one color
-      #'<label for="clx">choose word color(all word one color)</label>',
       HTML('<input id="clx" type="color" class="form-control" value="#ff0000">',
            '<input id="cl" type="text" class="form-control" value="#ff0000" style="display:none">',
            '<script>',
@@ -61,7 +59,7 @@ shinyUI(fluidPage(
       ),
       
       #background
-      selectInput("backgroundColor","background color",c('white','antiquewhite','skyblue','gray','darkseagreen',
+      selectInput("backgroundColor","Background color",c('white','antiquewhite','skyblue','gray','darkseagreen',
                                                          'ghostwhite','khaki','lightblue','lightpink','lightyellow')),
       
       #how many to show
@@ -70,16 +68,40 @@ shinyUI(fluidPage(
                   min = 1,
                   max = 100,
                   value = 100),
+      HTML('<input class="button btn" type="button" value="Save this word cloud" style="background-color:white;border:1px solid #aeaeae;margin-top:10px;"></input> 
+           '),
       width = 3
       
     ),
     # Show a plot of the generated distribution
-    mainPanel(HTML(
+    mainPanel(
+      tags$head(tags$script(src="html2canvas.js")),
+      HTML(
       '<div style="width:100%;height:700px;overflow:hidden;positive:absolute">'),wordcloud2Output("distPlot"),width=9,HTML('</div>',
       '<script>',
       'window.onload=function(){
         var elem=document.getElementById("distPlot");
         elem.style.height="700px";
+
+        $(".button").on("click", function(event) {  
+            event.preventDefault();  
+            html2canvas(document.getElementById("distPlot"), {  
+              allowTaint: true,  
+              taintTest: false,  
+              onrendered: function(canvas) {  
+              canvas.id = "mycanvas";  
+      
+              var dataUrl = canvas.toDataURL();  
+              var newImg = document.createElement("img");  
+              newImg.src =  dataUrl;  
+
+              var a = document.createElement("a");
+              a.href = newImg.src;
+              a.download = "wordcloud";
+              a.click();
+          }  
+        });  
+      }); 
       }',
       '</script>'
       )

@@ -27,7 +27,7 @@ library(textstem)
 #define stop word
 stop_word <- read_csv('./WordFreq/stop-word-list.csv') 
 welcome_word <-read_csv('./welcome/demo.csv')
-print(welcome_word)
+
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
   output$distPlot <- renderWordcloud2({
@@ -59,7 +59,7 @@ shinyServer(function(input, output) {
 
     #4.bins
     length=nrow(data)
-    print(length)
+
     #5.color
     colorcontrol <- input$wordColor
     if(colorcontrol=='custom-colors'){
@@ -67,7 +67,7 @@ shinyServer(function(input, output) {
     }else{
       colorcontrol = input$wordColor
     }
-    print(input$bins)
+
     wordcloud2(data[0:(length*(input$bins / 100)),], size = 1, minSize = 0, gridSize =  0,  
                        
                        fontFamily = input$fontFamily, fontWeight = 'normal',  
@@ -98,6 +98,7 @@ shinyServer(function(input, output) {
 GenerateWordFreq <- function(file_path){
   #2.Read the text file to be analyzed
   text = readLines(file_path,encoding = 'UTF-8')
+
   #3.Remove meaningless line breaks, in txt
   txt = text[text!='']
   #4.Convert all to lowercase, avoiding the impact of capitalization
@@ -117,21 +118,19 @@ GenerateWordFreq <- function(file_path){
   
   #9.Sort data
   ordFreq = data[order(data$freq,decreasing=T),]
-  
 
   #10.Performing a morphological restoration; here the morphological restoration is done for greater efficiency
-  lemmatize_result <- lemmatize_words(result$Word)
-  result$Word=lemmatize_result
-  result=na.omit(result)
-  
+  lemmatize_result <- lemmatize_words(ordFreq$Word)
+  ordFreq$Word=lemmatize_result
+  result=na.omit(ordFreq)
 
   #11.Combine the same words and add freq
   result=aggregate(freq ~ Word, data = result, sum)
-  
+  print(nrow(result))
   #12.Filter stop words
   antiWord = data.frame(stop_word,stringsAsFactors=F)
-  result = anti_join(ordFreq,antiWord,by='Word') %>% arrange(desc(freq))
-  
+  result = anti_join(result,antiWord,by='Word') %>% arrange(desc(freq))
+  print(nrow(result))
   #13.Filter words with a length greater than 2 (usually less than 2 words are meaningless words, numbers, symbols)
   result <- filter(result, nchar(as.character(Word)) > 3)
   result <- filter(result, freq > 2)
